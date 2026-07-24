@@ -1,103 +1,197 @@
-# LISS-IV-Automated-Dataset-Builder
-Automated dataset generation pipeline for LISS-IV satellite imagery with metadata extraction, cloud estimation, scene matching, alignment and AI-ready patch generation for cloud removal research.
+# LISS-IV Automated Dataset Builder
 
-# 🌍 LISS-IV Automated Dataset Builder
+by Yash Badodiya
+LinkedIn= https://www.linkedin.com/in/yash-badodiya-11571b378/
 
-> Fully automated pipeline for generating AI-ready cloud removal datasets from ISRO LISS-IV satellite imagery.
+## Overview
 
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-DeepLearning-red)
-![Flask](https://img.shields.io/badge/Flask-WebApp-black)
-![Rasterio](https://img.shields.io/badge/Rasterio-GIS-green)
+This project automatically creates a cloud removal training dataset from LISS-IV satellite imagery.
 
----
+Instead of manually preparing data, the system processes multiple LISS-IV ZIP files, finds overlapping scenes, aligns them, and generates AI-ready training patches automatically.
 
-## 🚀 Overview
-
-Preparing datasets for satellite cloud removal normally requires significant manual work such as downloading imagery, extracting metadata, pairing scenes, image alignment, and generating training patches.
-
-This project automates the complete workflow for **Resourcesat-2/Resourcesat-2A LISS-IV** imagery.
-
-Starting from raw satellite ZIP files, the pipeline automatically generates AI-ready training data suitable for deep learning models such as U-Net and Attention U-Net.
+The final dataset can be used to train deep learning models such as U-Net or Attention U-Net for cloud removal.
 
 ---
 
-# ✨ Key Features
+# Downloading Required Data
 
-- Automatic LISS-IV ZIP extraction
-- RGB image generation
-- Metadata extraction
-- Cloud percentage estimation
-- DEM-based elevation lookup
-- Snow risk estimation
-- Season-aware scene matching
-- Geographic overlap detection
-- Automatic cloudy-clear pair generation
-- Pixel alignment
-- 256×256 patch extraction
-- Duplicate protection
-- Incremental dataset generation
-- Automatic metadata storage
+The dataset builder requires two types of data:
+
+1. LISS-IV Satellite Images
+2. Digital Elevation Model (DEM)
 
 ---
 
-## Requirements
+# 1. LISS-IV Satellite Images
 
-- Python 3.12+
-- Flask 3.1.3
-- PyTorch 2.12.1
-- Rasterio 1.5.0
-- NumPy 2.5.1
-- Matplotlib 3.11.1
-- Shapely 2.1.2
+# Downloading LISS-IV Satellite Data
+
+This project uses **LISS-IV (Linear Imaging Self Scanner-IV)** optical satellite imagery from **Resourcesat-2/Resourcesat-2A**.
+
+The Dataset Builder is designed to work directly with the original downloaded ZIP files.
 
 ---
 
-# 📂 Repository Structure
+## Download Source
 
-```
-LISS-IV-Automated-Dataset-Builder
+LISS-IV imagery can be downloaded from the **ISRO Bhoonidhi Portal**.
 
-│
-├── app.py                      # Flask web application
-├── pipeline.py                 # Pipeline controller
-├── find_overlaps.py            # Geographic overlap detection
-├── create_training_pairs.py    # Cloudy-clear scene pairing
-├── align_all_pairs.py          # Image registration
-├── extract_patches.py          # Patch extraction
-├── elevation_lookup.py         # DEM elevation lookup
-├── model.py
-│
-├── uploads/
-├── dataset/
-├── aligned/
-├── patches/
-├── dem/
-├── models/
-├── static/
-├── templates/
-└── README.md
-```
-
-
-
-# 🛰 Required Data
-
-This project requires **two datasets**.
-
-## 1️⃣ LISS-IV Satellite Images
-
-Download from:
+Website:
 
 https://bhoonidhi.nrsc.gov.in/
 
-Supported:
+Create an account and log in.
 
-- Resourcesat-2
-- Resourcesat-2A
-- LISS-IV (MX)
+---
 
-Required files inside every ZIP
+## Data Selection
+
+While searching for data, select the following:
+
+**Data Type**
+
+```
+Optical Data
+```
+
+**Satellite**
+
+```
+Resourcesat-2
+or
+Resourcesat-2A
+```
+
+**Sensor**
+
+```
+LISS-IV
+```
+
+**Spatial Resolution**
+
+```
+5m-25m (medium)
+```
+
+Choose the required:
+
+- Study Area
+- Date Range
+- Cloud Conditions (if available)
+- Path/Row
+
+Then add the scenes to your cart and download them as ZIP files.
+
+---
+
+## Supported Product
+
+The application is designed for **LISS-IV Multi-Spectral (MX)** products.
+
+Typical specifications:
+
+| Property | Value |
+|----------|-------|
+| Satellite | Resourcesat-2 / Resourcesat-2A |
+| Sensor | LISS-IV |
+| Data Type | Optical |
+| Spatial Resolution | 5-25 m |
+| Bands Used | Band 2 (Green), Band 3 (Red), Band 4 (NIR) |
+| Product Format | GeoTIFF (.tif) |
+| Metadata | BAND_META.txt |
+
+---
+
+## Important
+
+Do **NOT** extract the downloaded ZIP files.
+
+The Dataset Builder automatically:
+
+- Extracts the ZIP
+- Reads the metadata
+- Finds BAND2
+- Finds BAND3
+- Finds BAND4
+- Creates the RGB image
+- Estimates cloud percentage
+- Generates the training dataset
+
+Simply upload the original ZIP files using the web interface.
+
+---
+
+## Example ZIP Structure
+
+```
+LISS4_SCENE.zip
+
+│
+├── BAND2.tif
+├── BAND3.tif
+├── BAND4.tif
+├── BAND_META.txt
+└── ...
+```
+
+No manual extraction or renaming is required.
+
+---
+
+# 2. Digital Elevation Model (DEM)
+
+Elevation data is optional but recommended.
+
+It is used to:
+
+- Estimate snow risk
+- Improve metadata
+- Future AI model improvements
+
+Recommended source:
+
+Copernicus DEM (30 m)
+
+Download from:
+
+https://dataspace.copernicus.eu/
+
+or
+
+OpenTopography
+
+https://opentopography.org/
+
+or
+
+USGS Earth Explorer
+
+https://earthexplorer.usgs.gov/
+
+Download the DEM covering your study area.
+
+Place the DEM files inside:
+
+```
+dem/
+```
+
+Example:
+
+```
+dem/
+
+Copernicus_DEM.tif
+```
+
+The system automatically reads elevation values for every scene.
+
+---
+
+# Required LISS-IV Product Structure
+
+The downloaded ZIP should contain files similar to:
 
 ```
 BAND2.tif
@@ -106,71 +200,72 @@ BAND4.tif
 BAND_META.txt
 ```
 
-⚠️ Do **NOT** extract the ZIP.
+The Dataset Builder automatically detects these files.
 
-Simply upload the original ZIP.
-
----
-
-## 2️⃣ Digital Elevation Model (DEM)
-
-Elevation data is **required** for the complete preprocessing pipeline.
-
-It is used for:
-
-- Elevation extraction
-- Terrain analysis
-- Snow risk estimation
-- Metadata enhancement
-- Scene matching
-
-Recommended sources
-
-- Copernicus DEM (30 m)
-- OpenTopography
-- USGS Earth Explorer
-
-Place the DEM inside
-
-```
-dem/
-
-Copernicus_DEM.tif
-```
+No manual extraction or renaming is required.
 
 ---
 
-# ⚙ Pipeline
+# Storage Requirements
+
+Large projects require significant storage.
+
+Recommended:
+
+| Dataset Size | Free Disk Space |
+|--------------|----------------:|
+| Small Project | 20 GB |
+| Medium Project | 100 GB |
+| Large Project | 300+ GB |
+
+Patch datasets can become much larger than the original satellite imagery.
+
+---
+
+# Internet Requirements
+
+Downloading LISS-IV imagery requires a stable internet connection.
+
+If downloading large datasets:
+
+- Download in batches.
+- Keep original ZIP files as backup.
+- Do not rename internal files inside the ZIP archives.
+
+---
+
+# Notes
+
+- Only original LISS-IV ZIP files are supported.
+- Do not modify the contents of the ZIP file.
+- The application automatically extracts only the required files.
+- Metadata is read automatically from `BAND_META.txt`.
+
+# Pipeline
 
 ```
-Raw LISS-IV ZIP Files
+LISS-IV ZIP Files
         │
         ▼
-ZIP Extraction
+Upload
         │
         ▼
 Metadata Extraction
         │
         ▼
-RGB Generation
+Preview Generation
         │
         ▼
-Cloud Estimation
+Manual Verification
         │
         ▼
-DEM Elevation Lookup
+Dataset Save
         │
         ▼
-Snow Risk Detection
+Find Overlapping Scenes
         │
         ▼
-Season Matching
-        │
-        ▼
-Geographic Overlap Detection
-        │
-        ▼
-Training Pair Generation
+Create Training Pairs
         │
         ▼
 Image Alignment
@@ -184,33 +279,33 @@ Training Dataset
 
 ---
 
-# 📊 Dataset Statistics
+# Folder Structure
 
-Successfully tested on multi-season LISS-IV imagery.
+```
+project/
 
-| Metric | Value |
-|---------|------:|
-| Training Pairs | 146,742 |
-| Generated Patches | 293,484 |
-| Patch Size | 256 × 256 |
-| Training Patches | 132,067 |
-| Validation Patches | 14,675 |
+│
+├── app.py
+├── pipeline.py
+│
+├── dataset/
+├── aligned/
+├── patches/
+│
+├── uploads/
+├── static/
+├── templates/
+│
+├── models/
+│
+└── README.md
+```
 
 ---
 
-# 🚀 Installation
+# How to Use
 
-```bash
-git clone https://github.com/Yash001-dev/LISS-IV-Automated-Dataset-Builder.git
-
-cd LISS-IV-Automated-Dataset-Builder
-```
-
-Install
-
-```bash
-pip install -r requirements.txt
-```
+## Step 1
 
 Run
 
@@ -221,33 +316,219 @@ python app.py
 Open
 
 ```
-http://127.0.0.1:5000 (local host)
+http://127.0.0.1:5000
 ```
 
 ---
 
-# 🧠 Technologies
+## Step 2
 
-### Programming
+Upload one or more extracted LISS-IV ZIP files.
 
-- Python
-- Flask
+The system automatically:
 
-### Deep Learning
-
-- PyTorch
-- NumPy
-
-### Remote Sensing
-
-- Rasterio
-- GDAL
-- GeoTIFF
-- SRTM DEM
+- extracts ZIP files
+- reads metadata
+- finds BAND2
+- finds BAND3
+- finds BAND4
+- creates RGB image
+- estimates cloud percentage
+- creates preview
 
 ---
 
-# 📈 Output
+## Step 3
+
+Review every scene.
+
+You can:
+
+- verify cloud percentage
+- change cloud category
+- mark scene quality
+- manually mark cloud regions (optional)
+
+---
+
+## Step 4
+
+Click
+
+```
+Save All Scenes
+```
+
+The system automatically:
+
+- copies RGB TIFF into dataset
+- saves metadata
+- stores scene information
+
+Then the automation pipeline starts automatically.
+
+---
+
+# Automatic Pipeline
+
+After saving, the following scripts run automatically.
+
+---
+
+## 1. find_overlaps.py
+
+Reads all saved metadata.
+
+Compares every scene with every other scene.
+
+Finds scenes covering the same location.
+
+Output:
+
+```
+overlap_pairs.json
+```
+
+---
+
+## 2. create_training_pairs.py
+
+Chooses:
+
+- cloudy image
+- clearer reference image
+
+Creates valid training pairs.
+
+---
+
+## 3. align_all_pairs.py
+
+Aligns the cloudy image with the clear image.
+
+Both images become pixel aligned.
+
+Output:
+
+```
+aligned/
+
+pair_001
+pair_002
+pair_003
+...
+```
+
+Each pair contains
+
+```
+cloudy.tif
+clear.tif
+```
+
+---
+
+## 4. extract_patches.py
+
+Reads every aligned pair.
+
+Splits images into
+
+```
+256 × 256
+```
+
+patches.
+
+Rejects
+
+- empty patches
+- NoData patches
+- mostly black patches
+
+Saves
+
+```
+patches/
+
+cloudy/
+clear/
+```
+
+Each cloudy patch has an identical clear patch.
+
+Example
+
+```
+cloudy/
+patch_000001.npy
+
+clear/
+patch_000001.npy
+```
+
+---
+
+# Automatic Patch Numbering
+
+Patch numbering is automatic.
+
+Example
+
+First run
+
+```
+patch_000001.npy
+
+...
+
+patch_050000.npy
+```
+
+Second run
+
+```
+patch_050001.npy
+
+...
+
+patch_080000.npy
+```
+
+Existing patches are never overwritten.
+
+---
+
+# Duplicate Protection
+
+The extractor remembers which aligned pairs have already been converted into patches.
+
+Previously processed pairs are skipped automatically.
+
+Only new aligned pairs generate new patches.
+
+---
+
+# Metadata Saved
+
+For every scene the following information is stored.
+
+- Path
+- Row
+- Date
+- Latitude
+- Longitude
+- Satellite
+- Sensor
+- Product ID
+- Cloud Percentage
+- Cloud Category
+- Elevation
+- Season
+
+---
+
+# Dataset Output
 
 ```
 patches/
@@ -255,27 +536,313 @@ patches/
 cloudy/
 
 patch_000001.npy
+patch_000002.npy
+...
 
 clear/
 
 patch_000001.npy
+patch_000002.npy
+...
 ```
 
-Every cloudy patch has one matching cloud-free patch.
+Every cloudy patch has exactly one matching clear patch.
 
 ---
 
-# 🔮 Future Work
+# AI Training
 
+The generated dataset can be used to train
+
+- U-Net
+- Attention U-Net
 - Diffusion Models
-- Transformer Reconstruction
-- Sentinel-1 SAR Integration
-- Sentinel-2 Guidance
-- Automatic Cloud Mask Generation
-- Near Real-Time Processing
+- Transformer based reconstruction models
 
 ---
 
+# Requirements
+
+Python
+
+Flask
+
+Rasterio
+
+NumPy
+
+Matplotlib
+
+PyTorch
+
+GDAL (recommended)
+
+---
+
+# Configuration
+
+Before running the project, update the folder paths according to your computer.
+
+---
+
+## 1. Dataset Folder
+
+Open:
+
+```
+app.py
+```
+
+Find:
+
+```python
+DATASET_FOLDER = r"C:\ISRO Hackathon\dataset"
+```
+
+Replace it with the location where you want your permanent dataset to be stored.
+
+Example:
+
+```python
+DATASET_FOLDER = r"D:\LISS_Dataset"
+```
+
+This folder stores:
+
+```
+dataset/
+├── 0-10/
+├── 10-20/
+...
+├── 90-100/
+└── dataset_metadata.json
+```
+
+---
+
+## 2. Upload Folder
+
+In `app.py` you will find:
+
+```python
+UPLOAD_FOLDER = "uploads"
+```
+
+Normally this does not need to be changed.
+
+It stores temporary uploaded ZIP files during processing.
+
+---
+
+## 3. Scene Folder
+
+Find:
+
+```python
+SCENE_FOLDER = os.path.join(
+    UPLOAD_FOLDER,
+    "scenes"
+)
+```
+
+Normally no changes are required.
+
+This folder contains temporary extracted scenes.
+
+It is automatically cleaned after successful processing.
+
+---
+
+## 4. Static Folder
+
+Find:
+
+```python
+STATIC_FOLDER = "static"
+```
+
+This folder stores preview images shown on the web interface.
+
+No changes are required.
+
+---
+
+## 5. DEM Folder (Elevation)
+
+If using elevation support, place your DEM files inside:
+
+```
+dem/
+```
+
+If you move this folder, update the path inside:
+
+```
+elevation_lookup.py
+```
+
+to match the new location.
+
+---
+
+## 6. Models Folder
+
+Store AI models inside:
+
+```
+models/
+```
+
+Example:
+
+```
+models/
+
+best_model.pth
+attention_unet_v2.pth
+future_model.pth
+```
+
+The Cloud Removal application automatically loads models from this folder.
+
+---
+
+## 7. Output Folder
+
+Generated outputs are stored inside:
+
+```
+patches/
+
+cloudy/
+
+clear/
+```
+
+Normally this location should not be changed.
+
+---
+
+## 8. Aligned Images
+
+Temporary aligned images are stored in:
+
+```
+aligned/
+```
+
+These images are used to generate training patches.
+
+---
+
+## 9. Patch Size
+
+Open:
+
+```
+extract_patches.py
+```
+
+Find:
+
+```python
+PATCH_SIZE = 256
+```
+
+Recommended value:
+
+```
+256
+```
+
+Do not change unless you also retrain the AI model with the same patch size.
+
+---
+
+# Directory Overview
+
+```
+Project Folder
+
+│
+├── app.py
+├── pipeline.py
+│
+├── uploads/          (Temporary uploads)
+├── static/           (Preview images)
+├── dataset/          (Permanent dataset)
+├── aligned/          (Aligned image pairs)
+├── patches/          (Training patches)
+├── models/           (AI models)
+├── dem/              (Elevation data)
+├── templates/        (HTML pages)
+│
+└── README.md
+```
+
+---
+
+# Automatic Cleanup
+
+The system automatically removes temporary files after processing.
+
+Automatically cleaned:
+
+```
+uploads/scenes/
+```
+
+Not deleted:
+
+```
+dataset/
+aligned/
+patches/
+models/
+dataset_metadata.json
+```
+
+These folders contain the permanent dataset and generated training data.
+
+---
+
+# Before Running
+
+Verify the following:
+
+- Python is installed.
+- Required libraries are installed.
+- `DATASET_FOLDER` points to the correct location.
+- DEM files (optional) are placed in the `dem/` folder.
+- LISS-IV ZIP files are available.
+- Enough disk space is available (recommended 100 GB or more for large datasets).
+
+# Notes
+
+- Only LISS-IV data is supported.
+- Patch size is fixed at 256 × 256.
+- Images are automatically aligned before patch extraction.
+- Metadata is stored for future filtering and model improvement.
+- Existing patches are preserved when new data is added.
+- Previously processed image pairs are skipped automatically.
+
+---
+
+# Future Improvements
+
+- Attention U-Net V2
+- Automatic cloud mask generation
+- Cloud mask editing tool
+- Multi-model inference
+- Batch prediction
+- Cloud-free image reconstruction
+- Web-based inference application
+
+---
+
+Developed for:
+
+**Generative AI Based Cloud Removal and Reconstruction of LISS-IV Satellite Imagery**
 # 👨‍💻 Author
 
 **Yash Badodiya**
