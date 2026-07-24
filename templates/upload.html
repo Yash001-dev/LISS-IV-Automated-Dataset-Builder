@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LISS-IV Dataset Builder</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f5f5f5;
+padding:40px;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:12px;
+max-width:700px;
+margin:auto;
+box-shadow:0px 0px 20px rgba(0,0,0,0.1);
+}
+
+button{
+background:#0d6efd;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:6px;
+cursor:pointer;
+}
+
+#loadingOverlay{
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(255,255,255,0.95);
+
+    z-index:9999;
+
+    justify-content:center;
+    align-items:center;
+
+}
+
+.loading-card{
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    box-shadow:0 0 20px rgba(0,0,0,0.15);
+
+}
+
+.spinner{
+
+    width:70px;
+    height:70px;
+
+    border:8px solid #ddd;
+
+    border-top:8px solid #0d6efd;
+
+    border-radius:50%;
+
+    margin:auto;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="card">
+
+<h1>LISS-IV Dataset Builder</h1>
+
+<form
+    id="uploadForm"
+    action="/preview"
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+<label>Select LISS-IV ZIP File</label>
+
+<input
+    type="file"
+    name="zip_files"
+    multiple
+    accept=".zip"
+    required>
+
+<br><br>
+
+<button type="submit">
+Generate Preview
+</button>
+
+</form>
+
+</div>
+
+<div id="loadingOverlay">
+
+    <div class="loading-card">
+
+        <div class="spinner"></div>
+
+        <h2>Processing Satellite Scenes...</h2>
+
+        <p id="statusText">
+            Extracting ZIP files...
+        </p>
+
+    </div>
+
+</div>
+<script>
+
+document.getElementById(
+    "uploadForm"
+).addEventListener(
+
+    "submit",
+
+    function(){
+
+        document.getElementById(
+            "loadingOverlay"
+        ).style.display = "flex";
+
+        document.body.style.overflow = "hidden";
+
+        const messages = [
+
+            "Extracting ZIP files...",
+            "Reading metadata...",
+            "Loading spectral bands...",
+            "Generating RGB previews...",
+            "Calculating cloud cover...",
+            "Preparing preview gallery..."
+
+        ];
+
+        let i = 0;
+
+        setInterval(function(){
+
+            if(i < messages.length){
+
+                document.getElementById(
+                    "statusText"
+                ).innerText = messages[i];
+
+                i++;
+
+            }
+
+        }, 2000);
+
+    }
+
+);
+
+</script>
+</body>
+</html>
